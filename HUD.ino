@@ -77,38 +77,18 @@ void setup() {
 
   testdrawline();      // Draw many lines
 
-  // testdrawrect();      // Draw rectangles (outlines)
-
-  // testfillrect();      // Draw rectangles (filled)
-
-  // testdrawcircle();    // Draw circles (outlines)
-
-  // testfillcircle();    // Draw circles (filled)
-
-  // testdrawroundrect(); // Draw rounded rectangles (outlines)
-
-  // testfillroundrect(); // Draw rounded rectangles (filled)
-
-  // testdrawtriangle();  // Draw triangles (outlines)
-
-  // testfilltriangle();  // Draw triangles (filled)
-
   testdrawchar();      // Draw characters of the default font
 
-  // testdrawstyles();    // Draw 'stylized' characters
-
-  // testscrolltext();    // Draw scrolling text
-
-  // testdrawbitmap();    // Draw a small bitmap image
-
-  // Invert and restore display, pausing in-between
-  
   delay(1000);
 
   //testanimate(logo_bmp, LOGO_WIDTH, LOGO_HEIGHT); // Animate bitmaps
 }
 
 void loop() {
+}
+
+float degToRad(float degree) {
+  return degree * 3.14 / 180.0;
 }
 
 void testdrawline() {
@@ -122,21 +102,79 @@ void testdrawline() {
 
   double halfScreen = (display.height()-1) / 2;
 
-  float x = (display.width()-1) / 2 - 30;
+  float x = (display.width()-1) / 2 - 40;
   float y = halfScreen;
 
-  float i_p = (display.width()-1) / 2 + 30;
+  float i_p = (display.width()-1) / 2 + 40;
   float j_p = halfScreen;
   
   display.drawLine( x, y , i_p, j_p, SSD1306_WHITE);
- 
-  float point[2];
-
-  rotatePoint(point, x, y, ((display.width()-1) / 2), ((display.height()-1) / 2), (90 * 3.14 / 180));
-
-  display.drawLine(((display.width()-1) / 2), ((display.height()-1) / 2), point[0]-2, point[1]-2, SSD1306_WHITE);
 
   display.display();
+
+  //delay(500);
+  //display.clearDisplay();
+ 
+  //float point[2];
+  //float point2[2];
+
+  //rotatePoint(point, x, y, ((display.width()-1) / 2), ((display.height()-1) / 2), degToRad(25));
+  //rotatePoint(point2, i_p, j_p, ((display.width()-1) / 2), ((display.height()-1) / 2), degToRad(25));
+
+  //display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
+
+  //display.display();
+
+  for (int thisPin = 0; thisPin < 45; thisPin++) {
+
+    delay(100);
+    display.clearDisplay();
+   
+    float point[2];
+    float point2[2];
+  
+    rotatePoint(point, x, y, ((display.width()-1) / 2), ((display.height()-1) / 2), degToRad(thisPin));
+    rotatePoint(point2, i_p, j_p, ((display.width()-1) / 2), ((display.height()-1) / 2), degToRad(thisPin));
+  
+    display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
+  
+    display.display();
+
+  }
+
+  for (int thisPin = 45; thisPin > -45; thisPin--) {
+
+    delay(100);
+    display.clearDisplay();
+   
+    float point[2];
+    float point2[2];
+  
+    rotatePoint(point, x, y, ((display.width()-1) / 2), ((display.height()-1) / 2), degToRad(thisPin));
+    rotatePoint(point2, i_p, j_p, ((display.width()-1) / 2), ((display.height()-1) / 2), degToRad(thisPin));
+  
+    display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
+  
+    display.display();
+
+  }
+
+  for (int thisPin = -45; thisPin < 0; thisPin++) {
+
+    delay(100);
+    display.clearDisplay();
+   
+    float point[2];
+    float point2[2];
+  
+    rotatePoint(point, x, y, ((display.width()-1) / 2), ((display.height()-1) / 2), degToRad(thisPin));
+    rotatePoint(point2, i_p, j_p, ((display.width()-1) / 2), ((display.height()-1) / 2), degToRad(thisPin));
+  
+    display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
+  
+    display.display();
+
+  }
   
   delay(80000); // Pause for 2 seconds
 }
