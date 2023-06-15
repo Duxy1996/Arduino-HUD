@@ -41,22 +41,10 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define LOGO_HEIGHT   16
 #define LOGO_WIDTH    16
 static const unsigned char PROGMEM logo_bmp[] =
-{ 0b00000000, 0b11000000,
-  0b00000001, 0b11000000,
-  0b00000001, 0b11000000,
-  0b00000011, 0b11100000,
-  0b11110011, 0b11100000,
-  0b11111110, 0b11111000,
-  0b01111110, 0b11111111,
-  0b00110011, 0b10011111,
-  0b00011111, 0b11111100,
-  0b00001101, 0b01110000,
-  0b00011011, 0b10100000,
-  0b00111111, 0b11100000,
-  0b00111111, 0b11110000,
-  0b01111100, 0b11110000,
-  0b01110000, 0b01110000,
-  0b00000000, 0b00110000 };
+{
+0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x1F, 0xE0, 0x3F, 0xE0, 0x38, 0x00, 0x38, 0x00, 0x38, 0x00,
+0x38, 0x00, 0x38, 0x00, 0x38, 0x20, 0x3F, 0xE0, 0x0F, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
 
 void setup() {
   Serial.begin(9600);
@@ -111,15 +99,13 @@ void setup() {
 
   // testscrolltext();    // Draw scrolling text
 
-  testdrawbitmap();    // Draw a small bitmap image
+  // testdrawbitmap();    // Draw a small bitmap image
 
   // Invert and restore display, pausing in-between
-  display.invertDisplay(true);
-  delay(1000);
-  display.invertDisplay(false);
+  
   delay(1000);
 
-  testanimate(logo_bmp, LOGO_WIDTH, LOGO_HEIGHT); // Animate bitmaps
+  //testanimate(logo_bmp, LOGO_WIDTH, LOGO_HEIGHT); // Animate bitmaps
 }
 
 void loop() {
@@ -128,23 +114,41 @@ void loop() {
 void testdrawline() {
   int16_t i;
 
-  display.clearDisplay(); // Clear display buffer
-
-  for(i=0; i<display.width(); i+=4) {
-    display.drawLine(0, 0, i, display.height()-1, SSD1306_WHITE);
-    display.display(); // Update screen with each newly-drawn line
-    delay(1);
-  }
+  display.clearDisplay(); // Clear display buffer  
 
   delay(2000); // Pause for 2 seconds
 
   display.clearDisplay(); // Clear display buffer
 
-  display.drawLine(0, 0, display.width()-1, display.height()-1, SSD1306_WHITE);
+  double halfScreen = (display.height()-1) / 2;
+
+  float x = (display.width()-1) / 2 - 30;
+  float y = halfScreen;
+
+  float i_p = (display.width()-1) / 2 + 30;
+  float j_p = halfScreen;
+  
+  display.drawLine( x, y , i_p, j_p, SSD1306_WHITE);
+ 
+  float point[2];
+
+  rotatePoint(point, x, y, ((display.width()-1) / 2), ((display.height()-1) / 2), (90 * 3.14 / 180));
+
+  display.drawLine(((display.width()-1) / 2), ((display.height()-1) / 2), point[0]-2, point[1]-2, SSD1306_WHITE);
 
   display.display();
   
-  delay(2000); // Pause for 2 seconds
+  delay(80000); // Pause for 2 seconds
+}
+
+void rotatePoint(float (& point)[2], float x, float y, float center_x, float center_y, float angle)
+{
+  
+  float x_end = (x - center_x) * cos(angle) - (y - center_y) * sin(angle) + center_x;
+  float y_end = (x - center_x) * sin(angle) + (y - center_y) * cos(angle) + center_y;
+
+  point[0] = x_end;
+  point[1] = y_end;
 }
 
 void testdrawrect(void) {
