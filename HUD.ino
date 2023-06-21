@@ -46,6 +46,8 @@ static const unsigned char PROGMEM logo_bmp[] =
 0x38, 0x00, 0x38, 0x00, 0x38, 0x20, 0x3F, 0xE0, 0x0F, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+int randomNumber = 200;
+
 void setup() {
   Serial.begin(9600);
 
@@ -71,28 +73,33 @@ void loop() {
 }
 
 float degToRad(float degree) {
-  return degree * 3.14 / 180.0;
+  return degree * PI / 180.0;
 }
 
 void testdrawline() {
   
-
-  delay(1000);
-
   display.clearDisplay();
 
-  for (int speedCounter = 80; speedCounter > 50; speedCounter = speedCounter - 10) {
+  for (int speedCounter = 50; speedCounter > 10; speedCounter = speedCounter - 10) {
 
   for (int thisPin = 0; thisPin < 45; thisPin++) {
-    drawHud(thisPin);
+    delay(speedCounter);
+    drawHud(thisPin, 0);
   }
 
   for (int thisPin = 45; thisPin > -45; thisPin--) {
-    drawHud(thisPin);
+    delay(speedCounter);
+    drawHud(thisPin, 0);
   }
 
   for (int thisPin = -45; thisPin < 0; thisPin++) {
-    drawHud(thisPin);
+    delay(speedCounter);
+    drawHud(thisPin, 0);
+  }
+
+  for (int roll = 0; roll < 45; roll++) {
+    delay(speedCounter);
+    drawHud(0, roll);
   }
   
   }
@@ -100,20 +107,38 @@ void testdrawline() {
   delay(80000); // Pause for 2 seconds
 }
 
-void drawHud(float thisPin)
+void drawHud(float thisPin, float pitch)
 {
+  
     display.clearDisplay();
-    
-    double halfScreen = (display.height()-1) / 2;
 
-    float x = (display.width()-1) / 2 - 40;
+    //display.setRotation(3);
+    
+    double halfScreen = (display.height()-1) / 2 + pitch;
+    double halfScreenSpeed = (display.height()-1) / 2;
+
+    float x = (display.width()-1) / 2 - 35;
     float y = halfScreen;
 
-    float i_p = (display.width()-1) / 2 + 40;
+    float i_p = (display.width()-1) / 2 + 35;
     float j_p = halfScreen;
 
     float centerX = ((display.width()-1) / 2);
     float centerY = ((display.height()-1) / 2);
+
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(10, halfScreenSpeed);
+    display.cp437(true); 
+
+     randomNumber += random(3);
+     randomNumber -= random(2);
+
+     char buffer[10];
+  
+    itoa(randomNumber, buffer, 10);
+  
+    display.write(buffer);
 
     float point[2];
     float point2[2];   
@@ -175,6 +200,54 @@ void drawHud(float thisPin)
     display.cp437(true);  
   
     display.write("-40");
+
+    display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
+    // -------------------------------------------------------------------
+    rotatePoint(point, x + 20, y - 30, centerX, centerY, degToRad(thisPin));
+    rotatePoint(point2, i_p - 20, j_p - 30, centerX, centerY, degToRad(thisPin));
+
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(point2[0] - 5, point2[1] + 2);
+    display.cp437(true);  
+  
+    display.write("60");
+
+    display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
+    // -------------------------------------------------------------------
+    rotatePoint(point, x + 20, y + 30, centerX, centerY, degToRad(thisPin));
+    rotatePoint(point2, i_p - 20, j_p + 30, centerX, centerY, degToRad(thisPin));
+
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(point2[0] - 5, point2[1] + 2);
+    display.cp437(true);  
+  
+    display.write("-60");
+
+    display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
+    // -------------------------------------------------------------------
+    rotatePoint(point, x + 20, y - 40, centerX, centerY, degToRad(thisPin));
+    rotatePoint(point2, i_p - 20, j_p - 40, centerX, centerY, degToRad(thisPin));
+
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(point2[0] - 5, point2[1] + 2);
+    display.cp437(true);  
+  
+    display.write("80");
+
+    display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
+    // -------------------------------------------------------------------
+    rotatePoint(point, x + 20, y + 40, centerX, centerY, degToRad(thisPin));
+    rotatePoint(point2, i_p - 20, j_p + 40, centerX, centerY, degToRad(thisPin));
+
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(point2[0] - 5, point2[1] + 2);
+    display.cp437(true);  
+  
+    display.write("-80");
 
     display.drawLine(point[0], point[1], point2[0], point2[1], SSD1306_WHITE);
     // -------------------------------------------------------------------
