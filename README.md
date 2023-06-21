@@ -32,6 +32,10 @@ To compile the Arduino HUD project, follow these steps:
 4. Customize the HUD by modifying the code in the "HUD.ino" sketch.
 5. Upload the modified sketch to the Arduino to see the changes.
 
+### Example
+
+![](/doc/HUD-example.gif)
+
 ## Contributors :sparkles:
 
 Thanks to the following contributors who have helped make this project possible:
