@@ -70,45 +70,82 @@ void setup() {
 
   delay(1000);
 
-  //testanimate(logo_bmp, LOGO_WIDTH, LOGO_HEIGHT); // Animate bitmaps
+  testdrawbitmap();
 }
 
 void loop() {
+  testdrawHud();
 }
 
+/**
+ * Convert degrees to radians.
+ * 
+ * This function takes a degree value as input and converts it to radians using the formula
+ * degree * PI / 180.0. It returns the corresponding value in radians.
+ * 
+ * @param degree The degree value to be converted to radians.
+ * @return The converted value in radians.
+ */
 float degToRad(float degree) {
   return degree * PI / 180.0;
 }
 
+/**
+ * Convert radians to degrees.
+ * 
+ * This function takes a radian value as input and converts it to degrees using the formula
+ * degree / PI * 180.0. It returns the corresponding value in degrees.
+ * 
+ * @param radian The radian value to be converted to degrees.
+ * @return The converted value in degrees.
+ */
+float radToDeg(float degree) {
+  return degree / PI * 180.0;
+}
+
+/**
+ * Perform a test drawing of the HUD.
+ * 
+ * This function clears the display and performs a series of rotations and delays
+ * to simulate the display of the HUD. It rotates the roll and pitch values within
+ * specified ranges and delays between each rotation to control the speed. The purpose
+ * of this test is to verify the functionality of the drawHud() method.
+ */
 void testdrawHud() {
   
   display.clearDisplay();
 
-  for (int speedCounter = 50; speedCounter > 10; speedCounter = speedCounter - 10) {
-
   for (int roll = 0; roll < 60; roll++) {
-    delay(speedCounter);
+    delay(10);
     drawHud(roll, 0);
   }
 
   for (int roll = 60; roll > -45; roll--) {
-    delay(speedCounter);
+    delay(10);
     drawHud(roll, 0);
   }
 
   for (int roll = -45; roll < 0; roll++) {
-    delay(speedCounter);
+    delay(10);
     drawHud(roll, 0);
   }
 
-  for (int roll = 0; roll < 45; roll++) {
-    delay(speedCounter);
-    drawHud(0, roll);
+  for (int pitch = 0; pitch < 45; pitch++) {
+    delay(10);
+    drawHud(0, pitch);
+  }
+
+  for (int pitch = 45; pitch > 0; pitch--) {
+    delay(10);
+    drawHud(0, pitch);
+  }
+
+  for (int pitch = 0; pitch < 45; pitch++) {
+    delay(10);
+    drawHud(pitch, pitch);    
   }
   
-  }
-  
-  delay(80000); // Pause for 2 seconds
+  delay(1000); // Pause for 2 seconds
 }
 
 /**
@@ -160,16 +197,109 @@ void drawHudLine(float pointX[2], float pointY[2], float center[2], float roll, 
     display.drawLine(pointA[0], pointA[1], pointB[0], pointB[1], SSD1306_WHITE);
 }
 
+/**
+ * Draws a long line on the HUD (Heads-Up Display) based on the given parameters.
+ *
+ * @param pointX[2]    An array containing the X-coordinates of the two points defining the line segment.
+ * @param pointY[2]    An array containing the Y-coordinates of the two points defining the line segment.
+ * @param center[2]    An array containing the X and Y coordinates of the center point of the HUD.
+ * @param roll         The roll angle used for rotating the line segment.
+ * @param offsetY      The offset value to adjust the line segment vertically.
+ * @param degreeString A character array to display the degree information on the HUD.
+ */
 void drawHudLongLine(float pointX[2], float pointY[2], float center[2], float roll, float offsetY, char degreeString[])
 {
     float deltaDrawLine = 0;    
     drawHudLine(pointX, pointY, center, roll, offsetY, degreeString, deltaDrawLine);
 }
 
+/**
+ * Draws a short line on the HUD (Heads-Up Display) based on the given parameters.
+ *
+ * @param pointX[2]    An array containing the X-coordinates of the two points defining the line segment.
+ * @param pointY[2]    An array containing the Y-coordinates of the two points defining the line segment.
+ * @param center[2]    An array containing the X and Y coordinates of the center point of the HUD.
+ * @param roll         The roll angle used for rotating the line segment.
+ * @param offsetY      The offset value to adjust the line segment vertically.
+ * @param degreeString A character array to display the degree information on the HUD.
+ */
 void drawHudShortLine(float pointX[2], float pointY[2], float center[2], float roll, float offsetY, char degreeString[])
 {
     float deltaDrawLine = 20;    
     drawHudLine(pointX, pointY, center, roll, offsetY, degreeString, deltaDrawLine);
+}
+
+/**
+ * Sets the speed label in the HUD (Heads-Up Display).
+ *
+ * @param speedHud            The speed value to be displayed in the HUD. (Non-negative)
+ * @param halfScreenSpeed  The Y-coordinate position on the screen where the speed label will be drawn.
+ */
+void setSpeedLabel(float speedHud, int halfScreenSpeed)
+{
+    if (speedHud < 0) {
+        // Ensure the speed is non-negative
+        speedHud = 0;
+    }
+
+    display.setCursor(10, halfScreenSpeed);
+
+    char buffer[10];
+    itoa(speedHud, buffer, 10);
+
+    display.write(buffer);
+}
+
+/**
+ * Draw the HUD leader lines.
+ * 
+ * This function is responsible for drawing the leader lines in the HUD (Head-Up Display). It takes the
+ * coordinates of two points, the center point, and the roll angle as input parameters. The leader lines
+ * indicate specific angles and are drawn using the drawHudLongLine() and drawHudShortLine() methods.
+ * 
+ * @param pointX An array containing the X-coordinates of the two points.
+ * @param pointY An array containing the Y-coordinates of the two points.
+ * @param center An array containing the X and Y coordinates of the center point.
+ * @param roll The roll angle in degrees.
+ */
+void drawHudLeader(float pointX[2], float pointY[2], float center[2], float roll)
+{
+    char degreeString[] = "XXX";
+
+    strcpy(degreeString, "0");
+    
+    drawHudLongLine(pointX, pointY, center, roll, 0, degreeString);
+    // -------------------------------------------------------------------
+    strcpy(degreeString, "-20");
+    drawHudShortLine(pointX, pointY, center, roll, 10 * 1.5, degreeString);    
+    // -------------------------------------------------------------------   
+    strcpy(degreeString, "20");
+    drawHudShortLine(pointX, pointY, center, roll, -10 * 1.5, degreeString);
+    // -------------------------------------------------------------------
+    strcpy(degreeString, "40");
+    drawHudShortLine(pointX, pointY, center, roll, -20 * 1.5, degreeString);
+    // -------------------------------------------------------------------
+    strcpy(degreeString, "-40");
+    drawHudShortLine(pointX, pointY, center, roll, 20 * 1.5, degreeString);
+    // -------------------------------------------------------------------
+    strcpy(degreeString, "60");
+    drawHudShortLine(pointX, pointY, center, roll, -30 * 1.5, degreeString);
+    // -------------------------------------------------------------------
+    strcpy(degreeString, "-60");
+    drawHudShortLine(pointX, pointY, center, roll, 30 * 1.5, degreeString);
+    // -------------------------------------------------------------------
+    strcpy(degreeString, "80");
+    drawHudShortLine(pointX, pointY, center, roll, -40 * 1.5, degreeString);
+    // -------------------------------------------------------------------
+    strcpy(degreeString, "-80");
+    drawHudShortLine(pointX, pointY, center, roll, 40 * 1.5, degreeString);
+    // -------------------------------------------------------------------
+    // strcpy(degreeString, "90");
+    // drawHudShortLine(pointX, pointY, center, roll, -45 * 1.5, degreeString);
+    // -------------------------------------------------------------------
+    // strcpy(degreeString, "-90");
+    // drawHudShortLine(pointX, pointY, center, roll, 45 * 1.5, degreeString);
+    // -------------------------------------------------------------------
 }
 
 /**
@@ -185,70 +315,36 @@ void drawHud(float roll, float pitch)
     display.clearDisplay();
 
     display.setRotation(0);
+
+    int hudSegmentLongitude = 35;
     
     double halfScreen = (display.height()-1) / 2 + pitch;
     double halfScreenSpeed = (display.height()-1) / 2;
 
-    float x = (display.width()-1) / 2 - 35;
-    float y = halfScreen;
+    float startHudPointX = (display.width()-1) / 2 - hudSegmentLongitude;
+    float startHudPointY = halfScreen;
 
-    float i_p = (display.width()-1) / 2 + 35;
-    float j_p = halfScreen;
+    float endHudPointX = (display.width()-1) / 2 + hudSegmentLongitude;
+    float endHudPointY = halfScreen;
 
     float centerX = ((display.width()-1) / 2);
-    float centerY = ((display.height()-1) / 2);
-    
-    display.setCursor(10, halfScreenSpeed);    
+    float centerY = ((display.height()-1) / 2);    
 
-     randomNumber += random(3);
-     randomNumber -= random(2);
-
-    char buffer[10];
-  
-    itoa(randomNumber, buffer, 10);
-  
-    display.write(buffer);
-
-    char degreeString[] = "XXX";
-
-    strcpy(degreeString, "0");
-
-    float pointX[2] = {x, y};
-    float pointY[2] = {i_p, j_p};
+    float pointX[2] = {startHudPointX, startHudPointY};
+    float pointY[2] = {endHudPointX, endHudPointY};
     float center[2] = {centerX, centerY};
 
-    drawHudLongLine(pointX, pointY, center, roll, 0, degreeString);
-    // -------------------------------------------------------------------
-    strcpy(degreeString, "-20");
-    drawHudShortLine(pointX, pointY, center, roll, 10, degreeString);    
-    // -------------------------------------------------------------------   
-    strcpy(degreeString, "20");
-    drawHudShortLine(pointX, pointY, center, roll, -10, degreeString);
-    // -------------------------------------------------------------------
-    strcpy(degreeString, "40");
-    drawHudShortLine(pointX, pointY, center, roll, -20, degreeString);
-    // -------------------------------------------------------------------
-    strcpy(degreeString, "-40");
-    drawHudShortLine(pointX, pointY, center, roll, 20, degreeString);
-    // -------------------------------------------------------------------
-    strcpy(degreeString, "60");
-    drawHudShortLine(pointX, pointY, center, roll, -30, degreeString);
-    // -------------------------------------------------------------------
-    strcpy(degreeString, "-60");
-    drawHudShortLine(pointX, pointY, center, roll, 30, degreeString);
-    // -------------------------------------------------------------------
-    strcpy(degreeString, "80");
-    drawHudShortLine(pointX, pointY, center, roll, -40, degreeString);
-    // -------------------------------------------------------------------
-    strcpy(degreeString, "-80");
-    drawHudShortLine(pointX, pointY, center, roll, 40, degreeString);
-    // -------------------------------------------------------------------
+    drawHudLeader(pointX, pointY, center, roll);
+
+    randomNumber += random(3);
+    randomNumber -= random(2);
+    
+    setSpeedLabel(randomNumber, halfScreenSpeed);
 
     if(roll > 50)
     {
       display.setTextSize(3);
-      display.setCursor(30
-      , 10);
+      display.setCursor(30, 17);
       display.write("BANK\n ANGLE");
     }
     display.display();  
