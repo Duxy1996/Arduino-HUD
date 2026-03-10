@@ -20,13 +20,22 @@ Written by Duxy1996 with code references and inspiration from Adafruit and
 the open-source community.
 **************************************************************************/
 
+// system libs
 #include <SPI.h>
 #include <Wire.h>
+
+// 3rd party libs
+
+// screen lib
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+// gyroscope lib
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define SCREEN_HEIGHT 32 // OLED display height, in pixels
 
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 // The pins for I2C are defined by the Wire-library. 
@@ -36,7 +45,11 @@ the open-source community.
 
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+
+// init adafruit class to manage display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+// Adafruit_MPU6050 mpu;
 
 #define NUMFLAKES     10 // Number of snowflakes in the animation example
 
@@ -50,8 +63,15 @@ static const unsigned char PROGMEM logo_bmp[] =
 
 int randomNumber = 200;
 
-void setup() {
-  Serial.begin(9600);
+Adafruit_MPU6050 mpu;
+
+float roll_general = 0;
+float pitch_general = 0;
+float yaw_general = 0;
+
+unsigned long lastTime;
+
+void setupScreen() {
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
@@ -64,17 +84,66 @@ void setup() {
 
   aboutInfo();
 
-  delay(1000);
+  // delay(1000);
 
-  testdrawHud();  
+  // testdrawHud();  
 
-  delay(1000);
+  // delay(1000);
 
-  testdrawbitmap();
+  // testdrawbitmap();
+  
 }
 
-void loop() {
-  testdrawHud();
+void setupGyroscope() {
+  if (!mpu.begin()) {
+    Serial.println("No se encontró el MPU6050");
+    while (1);
+  }
+
+  Serial.println("MPU6050 listo");
+
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+
+  lastTime = millis();  
+}
+
+void setup() {
+  Serial.begin(57600);
+  
+  Wire.begin();
+
+  setupScreen();
+  setupGyroscope();
+}
+
+void loop() { 
+
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  unsigned long now = millis();
+  float dt = (now - lastTime) / 1000.0;
+  lastTime = now;
+
+  float accRoll = atan2(a.acceleration.y, a.acceleration.z) * 180 / PI;
+  float accPitch = atan2(-a.acceleration.x,
+                  sqrt(a.acceleration.y * a.acceleration.y +
+                       a.acceleration.z * a.acceleration.z)) * 180 / PI;
+
+  roll_general += g.gyro.x * dt * 180 / PI;
+  pitch_general += g.gyro.y * dt * 180 / PI;
+  yaw_general += g.gyro.z * dt * 180 / PI;
+
+  float alpha = 0.96;
+
+  roll_general = alpha * roll_general + (1 - alpha) * accRoll;
+  pitch_general = alpha * pitch_general + (1 - alpha) * accPitch;
+
+  drawHud(roll_general, -pitch_general);
+
+  // testdrawHud();
 }
 
 /**
@@ -341,12 +410,23 @@ void drawHud(float roll, float pitch)
     
     setSpeedLabel(randomNumber, halfScreenSpeed);
 
-    if(roll > 50)
-    {
-      display.setTextSize(3);
-      display.setCursor(30, 17);
-      display.write("BANK\n ANGLE");
-    }
+    
+    
+    display.setTextSize(1);
+    display.setCursor(30, 17);
+    display.write("Roll: ");
+
+    char degreeString[] = "XXX";
+
+    // roll = 69;
+
+    dtostrf(roll_general, 4, 1, degreeString);
+    
+    
+    display.write(degreeString);
+
+    
+    
     display.display();  
 }
 
