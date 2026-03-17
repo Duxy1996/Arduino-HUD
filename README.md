@@ -46,7 +46,7 @@ https://github.com/adafruit/Adafruit_SSD1306/issues/33
 
 ### Example
 
-![example](/doc/HUD-example.gif)
+![example](/doc/images/HUD-example.gif)
 
 ## PCB
 
