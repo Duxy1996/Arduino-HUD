@@ -39,6 +39,11 @@ To compile the Arduino HUD project, follow these steps:
 4. Customize the HUD by modifying the code in the "HUD.ino" sketch.
 5. Upload the modified sketch to the Arduino to see the changes.
 
+## Problems found
+The main problem is that the Arduino Mini Pro only have 2KB of RAM. Only the Adafruit OLED controller uses 44% if the RAM memory. There is no much information about this topic and the IA tools are not very helpfull.
+
+https://github.com/adafruit/Adafruit_SSD1306/issues/33
+
 ### Example
 
 ![example](/doc/HUD-example.gif)
