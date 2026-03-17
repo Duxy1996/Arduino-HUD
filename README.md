@@ -1,18 +1,25 @@
 # Arduino HUD :bulb:
 
-A simple Heads-Up Display (HUD) project for Arduino.
+A simple Heads-Up Display (HUD) project for Arduino Pro Mini which visualices a MPU6050 gyroscope.
 
 ## Description :rocket:
 
-The Arduino HUD project provides a basic HUD interface for a small screen, allowing you to display information or data in a visually appealing way.
+A compact Heads-Up Display (HUD) for Arduino boards using a 128x32 OLED screen and the SSD1306 driver. It visualizes roll, pitch, and other flight-style metrics using a gyroscope (MPU6050). Designed for low RAM usage and optimized for small microcontrollers like the Arduino Pro Mini.
 
 ## Quick Start :rocket:
 
 1. Connect the Arduino to your computer.
-2. Open the Arduino IDE and load the "HUD.ino" sketch.
-3. Compile and upload the sketch to your Arduino board.
-4. Connect the display to the Arduino following the wiring instructions in the "Connections.md" file.
-5. Power on the Arduino and the HUD will start displaying information.
+2. Download the Adafruit dependencies using the Arduino IDE. Also can be downloaded from here: (Adafruit_SSD1306)[https://github.com/adafruit/Adafruit_SSD1306/blob/master/examples/ssd1306_128x32_i2c/ssd1306_128x32_i2c.ino]
+3. Open the Arduino IDE and load the "HUD.ino" sketch.
+4. Compile and upload the sketch to your Arduino board.
+5. Connect the display to the Arduino following the wiring instructions in the "Connections.md" file.
+6. Power on the Arduino and the HUD will start displaying information.
+
+### Schemes and blueprints
+
+How to connect all the system:
+
+![electric scheme](doc/images/electric_scheme.png)
 
 ## Compilation Manual :gear:
 
@@ -32,9 +39,26 @@ To compile the Arduino HUD project, follow these steps:
 4. Customize the HUD by modifying the code in the "HUD.ino" sketch.
 5. Upload the modified sketch to the Arduino to see the changes.
 
+## Problems found
+The main problem is that the Arduino Mini Pro only have 2KB of RAM. Only the Adafruit OLED controller uses 44% if the RAM memory. There is no much information about this topic and the IA tools are not very helpfull.
+
+https://github.com/adafruit/Adafruit_SSD1306/issues/33
+
 ### Example
 
-![](/doc/HUD-example.gif)
+![example](/doc/HUD-example.gif)
+
+## PCB
+
+Image to the PCB scheme for building a more robust project and not use the prototyping breadboard.
+
+![pcb-scheme](/doc/images/pcb_scheme.png)
+
+3d recreadtion to the PCB construction.
+
+![pcb-scheme](/doc/images/inclinometer.png)
+
+![pcb-scheme](/doc/images/inclinometer_componenets.png)
 
 ## Contributors :sparkles:
 
